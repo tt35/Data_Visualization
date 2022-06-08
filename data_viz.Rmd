@@ -1,0 +1,190 @@
+---
+title: "Midterm Project - Inequality in the US"
+author: "Tom Takeuchi"
+date: "11/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(plotly)    # For animated visualization
+```
+
+## Overview
+
+The data I am working with is about inequality in income in the US. The graph I cited shows the different proportions of income shares between the top 1% and the bottom 50%.
+The original visualization was taken from [this article](https://wir2018.wid.world/files/download/wir2018-summary-english.pdf).
+
+The original visualization looks like:
+```{r my-screenshot, echo=FALSE}
+knitr::include_graphics("https://americandelusions.com/wp-content/uploads/2017/12/12142017-WordlInequalityReport3-1024x744.png")
+```
+
+The falsifiable statement that the article makes is that inequality has been growing in the US. Specifically, the article says that the top 1% richest individuals in the United States captured twice as much growth as the bottom 50% individuals since 1980.
+
+## Design
+
+The original visualization uses geom_line function, which shows the inequality in income shares effectively and clearly. The variables being used in the visualization are year, the proportion of income share, and social class.
+
+In this visualization, color hue does a good job showing the different lines. Since it only has two distinctive colors, the plot is color blind friendly as well.
+
+While this is a simple visualization, it clearly shows the trend in which the income shares of the top 1% have been increasing dramatically over time while the income shares of the bottom 50% have been declining. This simplicity also enables the visualization to require a few saccades to see the trend. Overall, this visualization does a great job showing the inequality in an efficient way.
+
+## Dataset
+I found the original data at the World Inequality Database (https://wid.world/).
+To get the exact same data as the original graph, I downloaded the data of income inequality in the US from the years 1980 to 2016. The income shares by different social classes are very powerful indicators of inequality in the US, and how the inequality has been increasing.
+
+The World Inequality Dataset aims to provide open and convenient access to the most extensive available database on the historical evolution of the world distribution of income and wealth, both within countries and between countries. 
+
+To provide reliable datasets, WID combines fiscal, survey and national accounts data in a systematic manner.
+This work is done by over a hundred researchers.
+
+```{r load data}
+wid <- read_csv("data/WID.csv", col_types = cols()) %>%
+  janitor::clean_names()   # clean the data
+wid
+```
+
+It has `r nrow(wid)`, and 3 columns. Each row represents the proportion of income shares by different social classes from the years 1980 to 2016.
+Each column represents percentile of income, year, and the proportion of income share. In the process of reading the data, I used janitor::clean_names() for sanity of each of the column name.
+
+## Wrangling
+
+In order to make the data into the form to replicate the original, I created a new dataset named wid1 that includes percentile, year, income shares, and status. The status column has either "Top 1%", or "Bottom 50%" based on the percentile. I used case_when and mutate functions to make this change.
+
+```{r wrangling data}
+wid1 <- wid %>%
+  mutate(status = case_when
+         (percentile == "p99p100" ~ "Top 1%",     # Name it "Top 1%" if the percentile is p99p100
+          percentile == "p0p50" ~ "Bottom 50%"))  # Name it "Top 50%" if the percentile is p0p50
+```
+
+
+## Replication
+
+The one challenge that I encountered is that the original visualization does not have a legend. Instead, it has labels next to each of the lines to describe which line represents which social class. I overcame this challenge by using geom_label functions. I set the labels to be shown next to the each line. I also used "theme(legend.position = "none")" to get rid of the legend. By doing this way, it enabled me to make the visualization very close to the original.
+
+In terms of the colors of each line, to make the replication as close to the original visualization as I could, I manually set the colors. I used [this website](https://www.coolgenerator.com/rgb-color-generator#:~:text=This%20rgb%20color%20generator%20is%20a%20powerful%20color,mouse.%20This%20color%20generator%20can%20generate%20all%20colors.) to make the similar colors.
+
+```{r fig.width=8, fg.height=8}
+wid1 %>%
+  ggplot(aes(x = year, y = income_share_usa, color = status)) +
+   geom_line(size = 1.5) +
+   geom_label(aes(x=2013, y= 0.19, label="Top 1% US"), color="#DE2F2F") +   # add labels on the plot
+   geom_label(aes(x=2013, y= 0.115, label="Bottom 50% US"), color="#3399FF") +
+   labs(title = "Top 1% vs. Bottom 50% national income shares in the US, 1980-2016", 
+        y = "Share of national income (%)") +
+   scale_y_continuous(labels = scales::percent, breaks = 
+                        c(0.1, 0.12, 0.14, 0.16, 0.18, 0.2, 0.22)) +   # set the scale for y axis
+   scale_x_continuous(breaks = 
+                        c(1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015)) +  # set the scale for x axis
+  scale_color_manual(values=c("#3399FF", "#DE2F2F")) + # set the color manually
+  theme_bw() + # change the background color to white
+  theme(legend.position = "none") # get rid of a legend
+```
+
+## Alternative Designs
+
+The two alternative designs I can think of are line chart and stacked bar chart that show other social classes in addition to the two classes it already has. By adding other social classes, I believe we can find unseen trends and understand the inequality in income shares better. 
+
+To implement this, I downloaded new indicators "Top 10% share", "Middle 40% share" in addition to the "Bottom 50% share" and "Top 1% share" on the WID website. 
+
+Also, the original visualization only shows the data from the years 1980 to 2016, but now, more current data is available, so I downloaded it to show the latest result.
+
+```{r load new data}
+wid_new <- read_csv("data/WID_new.csv", col_types = cols()) %>%
+  janitor::clean_names()   # clean the data
+```
+
+Just like what I did to the original data, I applied data wrangling to the new data in the same way by using mutate and case_when functions.
+
+```{r data wrangling for new data}
+wid_new1 <- wid_new %>%
+  mutate(status = case_when(percentile == "p99p100" ~ "Top 1%", percentile == "p0p50" ~ "Bottom 50%",
+                            percentile == "p90p100" ~ "Top 10%", percentile == "p50p90" ~ "Middle 40%"))
+wid_new1
+```
+
+
+### Alternative Line Chart
+
+The line plot that the original visualization has enables us to clearly see where the lines cross. Around the year 1996, the income shares of the top 1% transcended the income shares of the bottom 50%. I think this is one of the advantages of using the line chart.
+
+This alternative design can maintain this advantage while adding other social classes.
+
+```{r fig.width=8, fg.height=8}
+wid_new1 %>%   # Make new variables based on the percentile
+  ggplot(aes(x = year, y = income_share_usa, color = status)) +
+  geom_line() +
+  geom_line(size = 1.5) +
+  labs(title = "Top 1% vs. Bottom 50% national income shares in the US, 1980-2016", 
+       y = "Proportional income share") +
+  theme_bw() + # change the background color to white
+  scale_y_continuous(labels = scales::percent, breaks = 
+                        c(0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5)) +
+  scale_x_continuous(breaks = 
+                       c(1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020))
+```
+
+In addition to the Bottom 50% and the Top 1%, we can see the other social classes, Middle 40% and Top 10%. Interestingly, the line of the Top 10% surpassed the line of the Middle 40% around the same time as when the same thing happened between the Top 1% and the Bottom 50%. 
+
+This alternative chart tells us that those who are in a high social class (top 1% and top 10%) make more and more money over time, while people in middle and low class (middle 40%, bottom 50%) get less and less money.
+
+This alternative visualization strengthens the falsifiable statement that the original visualization makes. 
+
+
+### Alternative Stacked Bar Chart
+
+Although this alternative design has to lose the original visualization's advantage which enable readers to see the crossing point of each line, it can show the easier visualization about the proportional shares of incomes. Just by looking at this chart, readers will be able to see the proportional changes of each social class effectively.
+Since the top 1% overlaps with the top 10%, I excluded the top 1% in this chart.
+
+```{r fig.width=9, fg.height=10}
+wid_new1 %>%
+  filter(status != "Top 1%") %>%
+  ggplot(aes(x=year, y = income_share_usa, fill = fct_rev(status))) +
+  geom_density(position = "fill", stat = "identity") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Income shares in the US by different social classes", 
+       y = "Income share", fill = "Social Class" ) +
+  geom_label(aes(x=2021, y= 0.13, label="12.7%"), color="black", fill = "white") +   # make labels
+  geom_label(aes(x=1978, y= 0.2, label="19.7%"), color="black", fill = "white") +
+  geom_label(aes(x=2021, y= 0.53, label="40.5%"), color="black", fill = "white") +
+  geom_label(aes(x=1978, y= 0.65, label="45.6%"), color="black", fill = "white") +
+  geom_label(aes(x=2021, y= 0.97, label="46.8%"), color="black", fill = "white") +
+  geom_label(aes(x=1978, y= 0.97, label="34.7%"), color="black", fill = "white") +
+  theme_bw() # change the background color to white
+```
+
+This visualization shows dramatic proportional changes over time. The labels on the chart help the readers know the specific proportions. The bottom 50% is the most vulnerable since the proportion declined by 7.0% over the 39 years. A 5.1 % decline can be observed in the middle 40%. On the other hand, when looking at the top 10%, a massive increase can be seen. Over the 39 years, it increased by 12.1%.
+
+These trends can represent the falsifiable claim that the original visualization makes, which is that inequality in income shares has been growing.
+
+### Challenging Design
+I was inspired by [this website](https://plotly.com/python/animations/). Thus, I tried making an animated visualization. In order to do this, I first installed the plotly package. The main problem I encountered when making this visualization was the label name. Since I was not sure how to change the name, I created a new column named "Income shares (%)" by using the mutate function. In this way, it did not require the change of the label name since it was already clear enough to show what it was about. In addition to this, I wanted to change the transition time since I thought it was a bit slow, but I could not figure out how. 
+
+```{r}
+wid_animation <- wid_new1 %>%
+  mutate("Income shares (%)" = income_share_usa * 100) %>% # create a new column that has the clear name
+  plot_ly(size = I(100), # size of each bar
+          type = "bar", # type of the chart
+          x = ~`Income shares (%)`, y = ~status, 
+          frame = ~year, # make the slider for the year
+          color = ~status)
+wid_animation
+```
+Even though there are some changes to be made to make this visualization better, I think this graph is visually interesting and memorable.
+
+## Summary
+After looking at the data by using different kinds of visualization, I believe that the original article's claim is correct. There is a certain inequality in income shares in the US, and the gaps between the high class and middle/low class have been getting bigger.
+
+While there were some challenges in replicating the original visualization, I could overcome all of them and my replication turned out to be very faithful to the original.
+
+I think the choice to include other social classes such as Middle 40% and Top 10% was successful. In this way, through the alternative line chart, I could find out the growth of the top 10%, and shrinkage of the middle 40% as well. This result make the original claim even stronger. The stacked bar chart does a good job showing the proportional changes in national incomes in an effective way as well. Overall, I believe that both of the alternative designs can support the original claim.
+
+One question that I have is why the top 1% and top 10% were vulnerable during the Great Recession. When looking at the alternative line chart, it is noticeable that there are huge drops shortly after 2005.
+During 2007 to 2009, The Great Recession hit in the US. That is when we can see the drops of the income shares of the top 1% and top 10%. The income shares by the top 1% and 10% dropped by 1.40% and 1.36% from 2007 to 2009 respectively. On the other hand, it dropped only by 0.2% in the bottom 50%, and it even increased by 1.57% in the middle class. Further research can be done on this phenomenon.
+
+Talking about the final project, predictive modeling could be made for this. However, I think I would need to download more indicators to make a better predictive modeling.
+
+Overall, this project was very fun for me. I got to experience the whole process starting from finding the data, and make visualization to analyze at the end.
