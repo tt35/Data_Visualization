@@ -1,4 +1,4 @@
-**Project Page** [Visualization of the Inequality in the US.](https://rpubs.com/tt35/719989)
+**Project Page**: [Visualization of the Inequality in the US.](https://rpubs.com/tt35/719989)
 
 ![image](https://user-images.githubusercontent.com/58647594/172678745-8894a7da-6c6c-42e6-aeca-b212cd6987d8.png)
 ![image](https://user-images.githubusercontent.com/58647594/172678851-dbd98558-2aaa-4f34-8c28-81c8c9372488.png)
