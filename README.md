@@ -1,3 +1,11 @@
-# Project Description
+**Project Page** [Visualization of the Inequality in the US.](https://rpubs.com/tt35/719989)
 
-[Visualization of the Inequality in the US.](https://rpubs.com/tt35/719989)
+![image](https://user-images.githubusercontent.com/58647594/172678745-8894a7da-6c6c-42e6-aeca-b212cd6987d8.png)
+![image](https://user-images.githubusercontent.com/58647594/172678851-dbd98558-2aaa-4f34-8c28-81c8c9372488.png)
+![image](https://user-images.githubusercontent.com/58647594/172678938-a403ea12-fe1f-49b9-86c3-78ee03e28c24.png)
+![image](https://user-images.githubusercontent.com/58647594/172679012-24f64b39-efd2-4774-8e06-b379f54f5282.png)
+![image](https://user-images.githubusercontent.com/58647594/172679084-85607fac-0fcf-4745-8a45-9a73d339ca4d.png)
+![image](https://user-images.githubusercontent.com/58647594/172679149-2ec52a1d-bb55-4c56-9266-c0b880385703.png)
+![image](https://user-images.githubusercontent.com/58647594/172679201-cdaec663-2e1b-4c19-801e-7c3f739f5ada.png)
+![image](https://user-images.githubusercontent.com/58647594/172679272-fb005d8c-a82c-4bd9-b74f-864a696fba29.png)
+![image](https://user-images.githubusercontent.com/58647594/172679325-6f755596-2d0c-4a77-b2ba-d35d668b4625.png)
